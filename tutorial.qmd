@@ -15,7 +15,7 @@ In this tutorial:
     - Single-model simulations and extensions;
     - Community modelling.
 - Use different tools and methodologies for each step;
-- Make changes or add lines to existing code to observe changes in results. Use this as a sandbox and <u>explore</u>!
+- Give feedback on this tutorial. I intend to publish it soon!
 
 
 # Reconstruction and model building
@@ -40,7 +40,7 @@ This is a fairly accurate answer. Now, let's look at how we can *actually* do th
 
 ## 1 - Introduction
 
-Metabolic reconstructions are achieved through essentially mapping genes,
+Metabolic reconstructions are achieved through the mapping of genes,
 reactions and metabolites into one cohesive and interconnected network known
 as a **Genome-Scale Metabolic Model (GEM)**. In practical terms, it requires us to
 obtain as much information from the genomic data so that through it, we can know
@@ -421,7 +421,7 @@ To achieve this, we generate community models that include every gene, reaction 
 
 There are a multitude of tools and libraries that enable us to generate, manipulate and simulate with these models. Some of the most notable include ReFramed, [MEWpy](https://github.com/BioSystemsUM/MEWpy/)[@pereiraMEWpyComputationalStrain2021] and [micom](https://github.com/micom-dev/micom)[@dienerMICOMMetagenomeScaleModeling2020]. For this part of the tutorial, we will use MEWpy. You can check more of the documentation [here](https://mewpy.readthedocs.io/)
 
-## 1 - Setting up
+## 2 - Setting up
 
 ```{python}
 
@@ -514,7 +514,7 @@ M9
 
 ```
 
-## 2 - Simulation using FBA
+## 3 - Simulation using FBA
 
 A very simple way to simulate a microbial community is to merge the individual models into a single model that mimics a "super organism", where each microbe lives inside its own compartment, and run a (conventional) FBA simulation for this super organism.
 
@@ -556,7 +556,7 @@ Actually it seems that only one of the organisms is growing while the other has 
 > Do you think this would be a stable consortium ?
 
 
-## 3 - Simulation using SteadyCom
+## 4 - Simulation using SteadyCom
 
 SteadyCom[@chanSteadyComPredictingMicrobial2017] is a recent community simulation method that takes into account the fact that to reach a stable composition the organisms need to grow at the same specific growth rate (1/h), which means that the absolute growth rate (gDW/h) of each organism is proportional to its abundance at steady-state (gDW).
 
@@ -598,7 +598,7 @@ build_escher(fluxes=steady.internal['glc_ko'])
 build_escher(fluxes=steady.internal['nh4_ko'])
 
 ```
-## 4 - Explore alternative solutions
+## 5 - Explore alternative solutions
 
 Unfortunately, one limitation of SteadyCom, which is exemplified by Chan, et al (2017) in Figure 3 (reproduced below), is the variability in the solution space when the community is not growing at the maximum (theoretical) growth rate.
 
@@ -634,9 +634,9 @@ We may now impose constraints on each organism growth, such as stating that each
 
 ```{python}
 
-constraints={community1.organisms_biomass['nh4_ko']:(0.1,1000), 
+constraints2={community1.organisms_biomass['nh4_ko']:(0.1,1000), 
              community1.organisms_biomass['glc_ko']:(0.1,1000)}
-sol_abun = sim_com.simulate(constraints=constraints)
+sol_abun = sim_com.simulate(constraints=constraints2)
 sol_abun
 
 ```
@@ -688,7 +688,7 @@ sim_com2.simulate().find('BIOMASS')
 
 ```
 
-## 5 - Interaction Analysis (SMETANA)
+## 6 - Interaction Analysis (SMETANA)
 
 SMETANA[@zelezniakMetabolicDependenciesDrive2015] implements several algorithms to analyse cross-feeding interactions in microbial communities. Please read the paper for a more detailed explanation.
 
@@ -752,11 +752,9 @@ MRO.individual_media.nh4_ko
 
 ```
 
-# Credits
+# References
 
 The code here presented is highly inspired and extracted from the ones in:
-
-# References
 
 - [embo_mcd22](https://github.com/cdanielmachado/embo_mcd22/tree/main)
 - [MEWpy/examples](https://github.com/BioSystemsUM/MEWpy/tree/master/examples)

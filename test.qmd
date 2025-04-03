@@ -1,0 +1,106 @@
+## 2 - Setting up
+
+```{python}
+
+import mewpy
+mewpy.info()
+
+```
+
+We will create a synthetic microbial consortium with two *E. coli* mutants growing in minimal medium. In one of the mutants we will knockout the glucose transporter and in the other we will knockout the ammonium transporter.
+
+```{python}
+
+from cobra.io import read_sbml_model
+from mewpy import get_simulator
+
+wild= read_sbml_model('data/models/e_coli_core.xml.gz')
+wildtype = get_simulator(wild)
+solution = wildtype.simulate()
+print(solution)
+solution.find('EX')
+
+```
+
+Now we create our two mutants (`glc_ko` and `nh4_ko`):
+
+```{python}
+
+glc_ko = wildtype.copy()
+glc_ko.id = 'glc_ko'
+glc_ko.set_reaction_bounds('GLCpts', 0, 0)
+
+```
+
+```{python}
+
+nh4_ko = wildtype.copy()
+nh4_ko.id = 'nh4_ko'
+nh4_ko.set_reaction_bounds('NH4t', 0, 0)
+
+```
+
+### Comparing models
+
+Community models require that metabolites have the same identifiers across all models. We can verify that by computing the metabolites, reactions and uptakes overlaps between a list models.
+
+```{python}
+
+from mewpy.com import *
+mets, rxns, over = jaccard_similarity_matrices([glc_ko, nh4_ko])
+
+```
+
+```{python}
+
+mets
+
+```
+```{python}
+
+rxns
+
+```
+```{python}
+
+over
+
+```
+
+### Building communities
+
+Let's initiate the `CommunityModel` class to create microbial communities from a list of models of individual species:
+
+```{python}
+
+from mewpy.model import CommunityModel
+community1 = CommunityModel([glc_ko, nh4_ko],flavor='cobra')
+sim_com = community1.get_community_model()
+
+```
+
+This community model ignores the environmental conditions that were specified in the original models (since these could be very different).
+
+To make our life easier, we will extract the nutrient composition specified in the wild-type model to use later.
+
+```{python}
+
+from mewpy.simulation import Environment
+M9 = Environment.from_model(wildtype)
+M9
+
+```
+
+## 3 - Simulation using FBA
+
+A very simple way to simulate a microbial community is to merge the individual models into a single model that mimics a "super organism", where each microbe lives inside its own compartment, and run a (conventional) FBA simulation for this super organism.
+
+```{python}
+
+sol_com = sim_com.simulate(constraints=M9)
+
+print(sol_com)
+sol_com.find('EX')
+
+```
+
