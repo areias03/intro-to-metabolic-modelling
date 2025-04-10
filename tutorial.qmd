@@ -268,16 +268,17 @@ Now let's run simulations for all the five conditions.
 ```{python}
 
 simulated = {}
-print('Condition \tGrowth \tPredicted')
+growth_predicted = {}
 
 for condition, rxn_id in uptake_reactions.items():
     uptake_rate = fluxomics.loc[rxn_id, condition]
     solution = FBA(model, constraints={rxn_id: uptake_rate})
     simulated[f'{condition}_sim'] = solution.values
-    print(f'{condition} \t{growth_rates[condition]} \t{solution.fobj}')
-    
+    growth_predicted[condition] = solution.fobj
+
 combined = pd.concat([fluxomics, pd.DataFrame(simulated)], axis=1, join='inner')
-    
+
+pd.DataFrame({'Growth': growth_rates, 'Predicted': growth_predicted})
 ```
 
 It seems that, in general, the model predicted similar growth rates to those that were measured.
@@ -314,16 +315,17 @@ model = load_cbmodel('data/models/e_coli_core.xml')
 model.reactions.R_EX_glc__D_e.lb = 0
 
 simulated = {}
-print('Condition \tGrowth \tPredicted')
+growth_predicted = {}
 
 for condition, rxn_id in uptake_reactions.items():
     uptake_rate = fluxomics.loc[rxn_id, condition]
     solution = FBA(model, constraints={rxn_id: uptake_rate})
     simulated[f'{condition}_sim'] = solution.values
-    print(f'{condition} \t{growth_rates[condition]} \t{solution.fobj}')
-    
+    growth_predicted[condition] = solution.fobj
+
 combined = pd.concat([fluxomics, pd.DataFrame(simulated)], axis=1, join='inner')
-    
+
+pd.DataFrame({'Growth': growth_rates, 'Predicted': growth_predicted})
 ```
 
 Now we observe that overall, the model predicted higher growth rates than what was measured.
@@ -337,7 +339,7 @@ So let's now additionally constrain the acetate secretion rate as well and see i
 ```{python}
 
 simulated = {}
-print('Condition \tGrowth \tPredicted')
+growth_predicted = {}
 
 for condition, rxn_id in uptake_reactions.items():
     constraints = {
@@ -346,10 +348,11 @@ for condition, rxn_id in uptake_reactions.items():
     }
     solution = FBA(model, constraints=constraints)
     simulated[f'{condition}_sim'] = solution.values
-    print(f'{condition} \t{growth_rates[condition]} \t{solution.fobj}')
-    
+    growth_predicted[condition] = solution.fobj
+
 combined2 = pd.concat([fluxomics, pd.DataFrame(simulated)], axis=1, join='inner')
-    
+
+pd.DataFrame({'Growth': growth_rates, 'Predicted': growth_predicted})
 ```
 
 There is some improvement in the prediction of growth rates. But what about the fluxes? How well are they predicted, and does this also improve when we constrain acetate secretion?
